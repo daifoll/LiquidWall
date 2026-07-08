@@ -1,0 +1,14 @@
+# Сборка
+.build/
+build/
+
+# macOS
+.DS_Store
+
+# Xcode / SPM локальное
+*.xcodeproj
+.swiftpm/
+Package.resolved
+
+# Артефакты упаковки
+*.dmg
