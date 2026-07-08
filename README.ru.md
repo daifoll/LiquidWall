@@ -83,3 +83,12 @@ xattr -d com.apple.quarantine /Applications/LiquidWall.app
   уровне `kCGDesktopWindowLevel`
 - Картинки из Pixabay без одобренного API-аккаунта доступны в максимум 1280px
   (для полного разрешения Pixabay должен одобрить аккаунт)
+
+## Автор
+
+- Создано [daifoll](https://github.com/daifoll)
+- Проект разработан с помощью нейросети (вайбкодинг) на модели **Fable 5** в [Cursor](https://cursor.com)
+
+## Лицензия
+
+[MIT](LICENSE)

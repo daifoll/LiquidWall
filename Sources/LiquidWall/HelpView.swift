@@ -71,6 +71,10 @@ struct HelpView: View {
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }
+
+                Text("Built with AI-assisted development (vibe coding) using the **Fable 5** model in Cursor.")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
             }
             .padding(28)
             .frame(maxWidth: .infinity, alignment: .leading)

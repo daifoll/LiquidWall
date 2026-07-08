@@ -105,6 +105,7 @@ Project layout:
 
 - Media provided by [Pixabay](https://pixabay.com) under the Pixabay Content License
 - Created by [daifoll](https://github.com/daifoll)
+- Built with AI-assisted development (vibe coding) using the **Fable 5** model in [Cursor](https://cursor.com)
 
 ## License
 
