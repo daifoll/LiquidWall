@@ -5,6 +5,7 @@ import UniformTypeIdentifiers
 struct ContentView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.locale) private var locale
     @State private var thumbnail: NSImage?
 
     static let windowSize = CGSize(width: 980, height: 620)
@@ -24,6 +25,7 @@ struct ContentView: View {
         }
         .background(backdrop)
         .frame(width: Self.windowSize.width, height: Self.windowSize.height)
+        .id(model.appLanguage)
         .sheet(item: $model.previewItem) { item in
             PreviewSheet(item: item)
         }
@@ -49,7 +51,7 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 Picker("", selection: $model.pane) {
                     ForEach(ContentPane.allCases) { pane in
-                        Text(pane.label).tag(pane)
+                        Text(pane.label(locale: locale)).tag(pane)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -115,6 +117,7 @@ enum MediaThumbnailer {
 
 private struct SidebarView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.locale) private var locale
     let thumbnail: NSImage?
 
     @State private var isDropTargeted = false
@@ -148,7 +151,7 @@ private struct SidebarView: View {
 
             Picker("", selection: $model.fillMode) {
                 ForEach(FillMode.allCases) { mode in
-                    Text(mode.label).tag(mode)
+                    Text(mode.label(locale: locale)).tag(mode)
                 }
             }
             .pickerStyle(.segmented)
@@ -161,7 +164,7 @@ private struct SidebarView: View {
 
             Text(
                 String(
-                    format: String(localized: "app.version", bundle: .module),
+                    format: L10n.string("app.version", locale: locale),
                     Self.appVersion
                 )
             )
@@ -185,7 +188,7 @@ private struct SidebarView: View {
                     Image(systemName: "sparkles.tv")
                         .font(.system(size: 32, weight: .light))
                         .foregroundStyle(.secondary)
-                    Text("preview.drop_hint", bundle: .module)
+                    LText("preview.drop_hint")
                         .font(.callout)
                         .multilineTextAlignment(.center)
                         .foregroundStyle(.secondary)
@@ -221,7 +224,7 @@ private struct SidebarView: View {
 
         return VStack(alignment: .leading, spacing: 14) {
             Label {
-                Text("settings.title", bundle: .module)
+                LText("settings.title")
             } icon: {
                 Image(systemName: "gearshape")
             }
@@ -229,11 +232,11 @@ private struct SidebarView: View {
                 .foregroundStyle(.secondary)
 
             HStack {
-                Text("settings.language", bundle: .module)
+                LText("settings.language")
                     .font(.callout)
                 Spacer()
                 Picker("", selection: $model.appLanguage) {
-                    Text("language.system", bundle: .module).tag(AppLanguage.system)
+                    LText("language.system").tag(AppLanguage.system)
                     Divider()
                     ForEach(AppLanguage.selectable) { lang in
                         Text(lang.nativeName).tag(lang)
@@ -244,12 +247,12 @@ private struct SidebarView: View {
             }
 
             HStack {
-                Text("settings.display", bundle: .module)
+                LText("settings.display")
                     .font(.callout)
                 Spacer()
                 Picker("", selection: $model.displayTarget) {
-                    Text("display.main", bundle: .module).tag(DisplayTarget.main)
-                    Text("display.all", bundle: .module).tag(DisplayTarget.all)
+                    LText("display.main").tag(DisplayTarget.main)
+                    LText("display.all").tag(DisplayTarget.all)
                     Divider()
                     ForEach(model.availableScreens, id: \.id) { screen in
                         Text(screen.name).tag(DisplayTarget.screen(screen.id))
@@ -260,20 +263,20 @@ private struct SidebarView: View {
             }
 
             Toggle(isOn: $model.launchAtLogin) {
-                Text("settings.launch_at_login", bundle: .module)
+                LText("settings.launch_at_login")
             }
                 .toggleStyle(.switch)
                 .controlSize(.small)
                 .font(.callout)
 
             HStack {
-                Text("settings.pixabay_key", bundle: .module)
+                LText("settings.pixabay_key")
                     .font(.callout)
                 Spacer()
                 Button {
                     model.pixabayKey = ""
                 } label: {
-                    Text("settings.change", bundle: .module)
+                    LText("settings.change")
                 }
                 .buttonStyle(.glass)
                 .buttonBorderShape(.capsule)
@@ -314,7 +317,7 @@ private struct SidebarView: View {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = AppModel.allowedTypes
         panel.allowsMultipleSelection = false
-        panel.message = String(localized: "open_panel.message", bundle: .module)
+        panel.message = L10n.string("open_panel.message", locale: locale)
         if panel.runModal() == .OK, let url = panel.url {
             model.select(url: url)
         }

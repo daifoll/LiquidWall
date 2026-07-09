@@ -36,7 +36,7 @@ struct LiquidWallApp: App {
                 Button {
                     AppDelegate.openHelpWindow?()
                 } label: {
-                    Text("menu.help", bundle: .module)
+                    LText("menu.help")
                 }
                 .keyboardShortcut("?", modifiers: .command)
             }
@@ -46,6 +46,7 @@ struct LiquidWallApp: App {
             HelpView()
                 .environment(model)
                 .environment(\.locale, model.resolvedLocale)
+                .id(model.appLanguage)
                 .containerBackground(.thinMaterial, for: .window)
         }
         .windowResizability(.contentSize)

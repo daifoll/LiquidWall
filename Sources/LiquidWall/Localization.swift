@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 /// Ресурсный bundle приложения — доступен вне MainActor (в отличие от `Bundle.module`).
 enum AppBundle {
@@ -28,6 +29,46 @@ enum AppBundle {
     }()
 
     nonisolated static var resources: Bundle { _resources }
+}
+
+enum L10n {
+    /// Явный lookup в .lproj — String(localized:locale:) не работает для SPM bundle
+    nonisolated static func string(_ key: String, locale: Locale, bundle: Bundle = AppBundle.resources) -> String {
+        for name in lprojCandidates(for: locale) {
+            guard let path = bundle.path(forResource: name, ofType: "lproj"),
+                  let locBundle = Bundle(path: path) else { continue }
+            let value = locBundle.localizedString(forKey: key, value: nil, table: nil)
+            if value != key { return value }
+        }
+        return bundle.localizedString(forKey: key, value: key, table: nil)
+    }
+
+    nonisolated private static func lprojCandidates(for locale: Locale) -> [String] {
+        var names: [String] = []
+        let id = locale.identifier.replacing("_", with: "-")
+        names.append(id)
+        names.append(id.lowercased())
+        if let code = locale.language.languageCode?.identifier {
+            names.append(code)
+        }
+        names.append("en")
+        var seen = Set<String>()
+        return names.filter { seen.insert($0).inserted }
+    }
+}
+
+/// Локализованный Text с явным lookup в .lproj
+struct LText: View {
+    let key: String
+    @Environment(\.locale) private var locale
+
+    init(_ key: String) {
+        self.key = key
+    }
+
+    var body: some View {
+        Text(L10n.string(key, locale: locale))
+    }
 }
 
 /// Поддерживаемые языки интерфейса
@@ -104,7 +145,7 @@ enum AppLanguage: String, CaseIterable, Identifiable, Codable {
     }
 
     static func resolved(from stored: String?) -> AppLanguage {
-        guard let stored, let lang = AppLanguage(rawValue: stored) else { return .system }
+        guard let stored, let lang = AppLanguage(rawValue: stored) else { return .en }
         return lang
     }
 }

@@ -11,8 +11,15 @@ enum FillMode: String, CaseIterable, Identifiable {
 
     var label: LocalizedStringResource {
         switch self {
-        case .fill: "fill_mode.fill"
-        case .fit: "fill_mode.fit"
+        case .fill: LocalizedStringResource("fill_mode.fill", bundle: .module)
+        case .fit: LocalizedStringResource("fill_mode.fit", bundle: .module)
+        }
+    }
+
+    func label(locale: Locale) -> String {
+        switch self {
+        case .fill: L10n.string("fill_mode.fill", locale: locale)
+        case .fit: L10n.string("fill_mode.fit", locale: locale)
         }
     }
 
@@ -32,8 +39,15 @@ enum GalleryCategory: String, CaseIterable, Identifiable {
 
     var label: LocalizedStringResource {
         switch self {
-        case .videos: "gallery_category.videos"
-        case .photos: "gallery_category.photos"
+        case .videos: LocalizedStringResource("gallery_category.videos", bundle: .module)
+        case .photos: LocalizedStringResource("gallery_category.photos", bundle: .module)
+        }
+    }
+
+    func label(locale: Locale) -> String {
+        switch self {
+        case .videos: L10n.string("gallery_category.videos", locale: locale)
+        case .photos: L10n.string("gallery_category.photos", locale: locale)
         }
     }
 }
@@ -46,8 +60,15 @@ enum ContentPane: String, CaseIterable, Identifiable {
 
     var label: LocalizedStringResource {
         switch self {
-        case .gallery: "content_pane.gallery"
-        case .library: "content_pane.library"
+        case .gallery: LocalizedStringResource("content_pane.gallery", bundle: .module)
+        case .library: LocalizedStringResource("content_pane.library", bundle: .module)
+        }
+    }
+
+    func label(locale: Locale) -> String {
+        switch self {
+        case .gallery: L10n.string("content_pane.gallery", locale: locale)
+        case .library: L10n.string("content_pane.library", locale: locale)
         }
     }
 }
@@ -226,11 +247,12 @@ final class AppModel {
             items = result.items
             totalHits = result.totalHits
             if items.isEmpty {
-                searchError = String(localized: "error.no_results", bundle: .module)
+                searchError = L10n.string("error.no_results", locale: resolvedLocale)
             }
         } catch {
             items = []
-            searchError = error.localizedDescription
+            searchError = (error as? PixabayError)?.localizedDescription(locale: resolvedLocale)
+                ?? error.localizedDescription
         }
         isSearching = false
     }
@@ -246,7 +268,8 @@ final class AppModel {
             page += 1
             items.append(contentsOf: result.items)
         } catch {
-            searchError = error.localizedDescription
+            searchError = (error as? PixabayError)?.localizedDescription(locale: resolvedLocale)
+                ?? error.localizedDescription
         }
         isLoadingMore = false
     }
@@ -278,8 +301,10 @@ final class AppModel {
             refreshLibrary()
             select(url: url)
         } catch {
-            let template = String(localized: "error.download_failed", bundle: .module)
-            searchError = String(format: template, error.localizedDescription)
+            let template = L10n.string("error.download_failed", locale: resolvedLocale)
+            let detail = (error as? PixabayError)?.localizedDescription(locale: resolvedLocale)
+                ?? error.localizedDescription
+            searchError = String(format: template, detail)
         }
     }
 

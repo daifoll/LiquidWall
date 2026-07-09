@@ -20,8 +20,7 @@ struct HelpView: View {
                             .font(.title2.weight(.semibold))
                         Text(
                             String(
-                                format: String(localized: "help.subtitle", bundle: .module, locale: locale),
-                                locale: locale,
+                                format: L10n.string("help.subtitle", locale: locale),
                                 version
                             )
                         )
@@ -30,24 +29,24 @@ struct HelpView: View {
                     }
                 }
 
-                section(LocalizedStringResource("help.about.title", bundle: .module)) {
-                    Text("help.about.body", bundle: .module)
+                section("help.about.title") {
+                    LText("help.about.body")
                 }
 
-                section(LocalizedStringResource("help.getting_started.title", bundle: .module)) {
-                    Text("help.getting_started.body", bundle: .module)
+                section("help.getting_started.title") {
+                    LText("help.getting_started.body")
                 }
 
-                section(LocalizedStringResource("help.displays.title", bundle: .module)) {
-                    Text("help.displays.body", bundle: .module)
+                section("help.displays.title") {
+                    LText("help.displays.body")
                 }
 
-                section(LocalizedStringResource("help.power.title", bundle: .module)) {
-                    Text("help.power.body", bundle: .module)
+                section("help.power.title") {
+                    LText("help.power.body")
                 }
 
-                section(LocalizedStringResource("help.notes.title", bundle: .module)) {
-                    Text("help.notes.body", bundle: .module)
+                section("help.notes.title") {
+                    LText("help.notes.body")
                 }
 
                 Divider()
@@ -55,17 +54,17 @@ struct HelpView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "person.crop.circle")
                         .foregroundStyle(.secondary)
-                    Text("help.created_by", bundle: .module)
+                    LText("help.created_by")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                     Link("github.com/daifoll", destination: URL(string: "https://github.com/daifoll")!)
                 }
 
-                Text("help.ai_dev_credit", bundle: .module)
+                LText("help.ai_dev_credit")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
 
-                Text("help.ai_translation_note", bundle: .module)
+                LText("help.ai_translation_note")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
             }
@@ -75,9 +74,9 @@ struct HelpView: View {
         .frame(width: 520, height: 560)
     }
 
-    private func section(_ title: LocalizedStringResource, @ViewBuilder content: () -> some View) -> some View {
+    private func section(_ titleKey: String, @ViewBuilder content: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title)
+            LText(titleKey)
                 .font(.headline)
             content()
                 .font(.callout)

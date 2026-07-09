@@ -3,6 +3,11 @@
 set -e
 cd "$(dirname "$0")"
 
+# SPM swift build не компилирует .xcstrings — генерируем .lproj для runtime
+python3 scripts/xcstrings_to_lproj.py \
+    Sources/LiquidWall/Resources/Localizable.xcstrings \
+    Sources/LiquidWall/Resources
+
 swift build -c release
 
 APP="build/LiquidWall.app"

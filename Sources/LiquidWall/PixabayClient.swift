@@ -76,7 +76,7 @@ enum GalleryItem: Identifiable, Hashable {
     func badge(locale: Locale = .current) -> String? {
         switch self {
         case .video(let video):
-            let format = String(localized: "duration.seconds", bundle: AppBundle.resources, locale: locale)
+            let format = L10n.string("duration.seconds", locale: locale, bundle: AppBundle.resources)
             return String(format: format, locale: locale, video.duration)
         case .photo:
             return nil
@@ -106,17 +106,21 @@ enum PixabayError: LocalizedError {
     case server(Int)
     case badURL
 
-    var errorDescription: String? {
+    func localizedDescription(locale: Locale) -> String {
         switch self {
         case .invalidKey:
-            String(localized: "pixabay.error.invalid_key", bundle: AppBundle.resources)
+            L10n.string("pixabay.error.invalid_key", locale: locale, bundle: AppBundle.resources)
         case .rateLimited:
-            String(localized: "pixabay.error.rate_limited", bundle: AppBundle.resources)
+            L10n.string("pixabay.error.rate_limited", locale: locale, bundle: AppBundle.resources)
         case .server(let code):
-            String(format: String(localized: "pixabay.error.server", bundle: AppBundle.resources), code)
+            String(format: L10n.string("pixabay.error.server", locale: locale, bundle: AppBundle.resources), code)
         case .badURL:
-            String(localized: "pixabay.error.bad_url", bundle: AppBundle.resources)
+            L10n.string("pixabay.error.bad_url", locale: locale, bundle: AppBundle.resources)
         }
+    }
+
+    var errorDescription: String? {
+        localizedDescription(locale: .init(identifier: "en"))
     }
 }
 

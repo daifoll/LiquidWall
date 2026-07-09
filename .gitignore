@@ -12,3 +12,6 @@ Package.resolved
 
 # Артефакты упаковки
 *.dmg
+
+# Генерируется из Localizable.xcstrings в build.sh
+Sources/LiquidWall/Resources/*.lproj/

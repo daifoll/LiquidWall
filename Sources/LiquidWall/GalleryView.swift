@@ -46,6 +46,7 @@ private struct PlayerLayerView: NSViewRepresentable {
 
 struct OnboardingView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.locale) private var locale
     @State private var draft = ""
 
     var body: some View {
@@ -54,10 +55,10 @@ struct OnboardingView: View {
                 .font(.system(size: 42, weight: .light))
                 .foregroundStyle(.secondary)
 
-            Text("onboarding.title", bundle: .module)
+            LText("onboarding.title")
                 .font(.title2.weight(.semibold))
 
-            Text("onboarding.subtitle", bundle: .module)
+            LText("onboarding.subtitle")
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -65,21 +66,21 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: 12) {
                 instructionRow(number: 1) {
                     HStack(spacing: 4) {
-                        Text("onboarding.step1", bundle: .module)
+                        LText("onboarding.step1")
                         Link("pixabay.com", destination: URL(string: "https://pixabay.com/accounts/register/")!)
                     }
                 }
                 instructionRow(number: 2) {
                     HStack(spacing: 4) {
-                        Text("onboarding.step2", bundle: .module)
+                        LText("onboarding.step2")
                         Link("pixabay.com/api/docs", destination: URL(string: "https://pixabay.com/api/docs/")!)
                     }
                 }
                 instructionRow(number: 3) {
-                    Text("onboarding.step3", bundle: .module)
+                    LText("onboarding.step3")
                 }
                 instructionRow(number: 4) {
-                    Text("onboarding.step4", bundle: .module)
+                    LText("onboarding.step4")
                 }
             }
             .padding(20)
@@ -87,7 +88,7 @@ struct OnboardingView: View {
 
             HStack(spacing: 10) {
                 SecureField(
-                    String(localized: "onboarding.api_key_placeholder", bundle: .module),
+                    L10n.string("onboarding.api_key_placeholder", locale: locale),
                     text: $draft
                 )
                     .textFieldStyle(.plain)
@@ -95,7 +96,9 @@ struct OnboardingView: View {
                     .padding(.vertical, 8)
                     .glassEffect(.regular, in: Capsule())
                     .onSubmit(save)
-                Button("onboarding.save", action: save)
+                Button(action: save) {
+                    LText("onboarding.save")
+                }
                     .buttonStyle(.glassProminent)
                     .buttonBorderShape(.capsule)
                     // .large подгоняет высоту кнопок под инпуты (вертикальный padding 8),
@@ -128,6 +131,7 @@ struct OnboardingView: View {
 
 struct GalleryPane: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.locale) private var locale
     @FocusState private var searchFocused: Bool
 
     private let columns = [GridItem(.adaptive(minimum: 190), spacing: 12)]
@@ -141,7 +145,7 @@ struct GalleryPane: View {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(.secondary)
                     TextField(
-                        String(localized: "gallery.search_placeholder", bundle: .module),
+                        L10n.string("gallery.search_placeholder", locale: locale),
                         text: $model.searchQuery
                     )
                         .textFieldStyle(.plain)
@@ -157,7 +161,7 @@ struct GalleryPane: View {
                                 .foregroundStyle(.secondary)
                         }
                         .buttonStyle(.plain)
-                        .help(String(localized: "gallery.clear_search", bundle: .module))
+                        .help(L10n.string("gallery.clear_search", locale: locale))
                     }
                 }
                 .padding(.horizontal, 14)
@@ -167,7 +171,7 @@ struct GalleryPane: View {
 
                 Picker("", selection: $model.category) {
                     ForEach(GalleryCategory.allCases) { category in
-                        Text(category.label).tag(category)
+                        Text(category.label(locale: locale)).tag(category)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -210,7 +214,7 @@ struct GalleryPane: View {
             }
 
             HStack(spacing: 4) {
-                Text("gallery.pixabay_attribution", bundle: .module)
+                LText("gallery.pixabay_attribution")
                 Link("Pixabay", destination: URL(string: "https://pixabay.com")!)
             }
                 .font(.caption)
@@ -359,7 +363,7 @@ struct PreviewSheet: View {
                 Spacer()
 
                 Button { dismiss() } label: {
-                    Text("preview.close", bundle: .module)
+                    LText("preview.close")
                 }
                     .buttonStyle(.glass)
                     .buttonBorderShape(.capsule)
@@ -376,7 +380,7 @@ struct PreviewSheet: View {
                             dismiss()
                         }
                     } label: {
-                        Text("preview.apply", bundle: .module)
+                        LText("preview.apply")
                     }
                     .buttonStyle(.glassProminent)
                     .buttonBorderShape(.capsule)
@@ -420,7 +424,7 @@ struct LibraryPane: View {
                     Image(systemName: "square.stack.3d.up.slash")
                         .font(.system(size: 32, weight: .light))
                         .foregroundStyle(.secondary)
-                    Text("library.empty", bundle: .module)
+                    LText("library.empty")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }
