@@ -1,7 +1,13 @@
 import SwiftUI
 
-/// Справка приложения (на английском)
+/// Справка приложения
 struct HelpView: View {
+    @Environment(\.locale) private var locale
+
+    private var version: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "dev"
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
@@ -12,54 +18,36 @@ struct HelpView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("LiquidWall")
                             .font(.title2.weight(.semibold))
-                        Text("Live wallpapers for macOS · v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "dev")")
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
+                        Text(
+                            String(
+                                format: String(localized: "help.subtitle", bundle: .module, locale: locale),
+                                locale: locale,
+                                version
+                            )
+                        )
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
                     }
                 }
 
-                section("About") {
-                    Text("""
-                    LiquidWall turns any video or image into a live desktop wallpaper. \
-                    Content is rendered in a borderless window at the desktop level — above the \
-                    system wallpaper, below your icons and app windows. Video decoding is fully \
-                    hardware-accelerated (AVFoundation), so CPU usage stays minimal.
-                    """)
+                section(LocalizedStringResource("help.about.title", bundle: .module)) {
+                    Text("help.about.body", bundle: .module)
                 }
 
-                section("Getting Started") {
-                    Text("""
-                    • Drag & drop a video (MP4, MOV) or image onto the preview card, \
-                    or click the folder button to pick a file.
-                    • Browse the built-in Pixabay gallery: search thousands of free videos \
-                    and photos, preview them, and apply in one click. A free API key from \
-                    [pixabay.com/api/docs](https://pixabay.com/api/docs/) is required.
-                    • Downloaded files are kept in the Library tab, where you can re-apply \
-                    or delete them.
-                    """)
+                section(LocalizedStringResource("help.getting_started.title", bundle: .module)) {
+                    Text("help.getting_started.body", bundle: .module)
                 }
 
-                section("Displays") {
-                    Text("""
-                    By default the wallpaper is shown on the main display. Use the Screen \
-                    picker in Settings to target all displays or a specific one.
-                    """)
+                section(LocalizedStringResource("help.displays.title", bundle: .module)) {
+                    Text("help.displays.body", bundle: .module)
                 }
 
-                section("Power Efficiency") {
-                    Text("""
-                    Playback pauses automatically when the desktop is fully covered by \
-                    windows or a full-screen app, when the screen is locked, and during \
-                    sleep. The wallpaper never prevents your display from sleeping.
-                    """)
+                section(LocalizedStringResource("help.power.title", bundle: .module)) {
+                    Text("help.power.body", bundle: .module)
                 }
 
-                section("Notes") {
-                    Text("""
-                    • The wallpaper is not visible over full-screen apps.
-                    • Media provided by [Pixabay](https://pixabay.com) under the Pixabay \
-                    Content License.
-                    """)
+                section(LocalizedStringResource("help.notes.title", bundle: .module)) {
+                    Text("help.notes.body", bundle: .module)
                 }
 
                 Divider()
@@ -67,13 +55,18 @@ struct HelpView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "person.crop.circle")
                         .foregroundStyle(.secondary)
-                    Text("Created by **daifoll** · [github.com/daifoll](https://github.com/daifoll)")
+                    Text("help.created_by", bundle: .module)
                         .font(.callout)
                         .foregroundStyle(.secondary)
+                    Link("github.com/daifoll", destination: URL(string: "https://github.com/daifoll")!)
                 }
 
-                Text("Built with AI-assisted development (vibe coding) using the **Fable 5** model in Cursor.")
+                Text("help.ai_dev_credit", bundle: .module)
                     .font(.caption)
+                    .foregroundStyle(.tertiary)
+
+                Text("help.ai_translation_note", bundle: .module)
+                    .font(.caption2)
                     .foregroundStyle(.tertiary)
             }
             .padding(28)
@@ -82,7 +75,7 @@ struct HelpView: View {
         .frame(width: 520, height: 560)
     }
 
-    private func section(_ title: String, @ViewBuilder content: () -> some View) -> some View {
+    private func section(_ title: LocalizedStringResource, @ViewBuilder content: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.headline)

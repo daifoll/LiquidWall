@@ -1,93 +1,126 @@
-# LiquidWall
+<p align="center">
+  <img src="docs/icon.png" width="128" alt="LiquidWall icon">
+</p>
 
-[English version](README.md)
+<h1 align="center">LiquidWall</h1>
 
-Минималистичные видео- и фото-обои для macOS Tahoe (26+) с нативным liquid-glass интерфейсом.
+<p align="center">
+  Живые видео- и фото-обои для macOS с нативным интерфейсом Liquid Glass.
+</p>
 
-Аналог Wallpaper Engine: контент показывается в безрамочном окне на уровне рабочего
-стола — над системными обоями, но под иконками и окнами приложений. Декодирование
-видео аппаратное (AVFoundation + AVPlayerLayer), поэтому нагрузка на CPU минимальная.
+<p align="center">
+  <a href="README.md">English</a> ·
+  <strong>Русский</strong> ·
+  <a href="README.zh-Hans.md">简体中文</a> ·
+  <a href="README.ja.md">日本語</a> ·
+  <a href="README.de.md">Deutsch</a> ·
+  <a href="README.es.md">Español</a> ·
+  <a href="README.pt-BR.md">Português (Brasil)</a> ·
+  <a href="README.fr.md">Français</a> ·
+  <a href="README.ko.md">한국어</a> ·
+  <a href="README.pl.md">Polski</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/macOS-26%2B-blue" alt="macOS 26+">
+  <img src="https://img.shields.io/badge/Swift-6.2-orange" alt="Swift 6.2">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
+</p>
+
+---
+
+Лёгкий аналог Wallpaper Engine для Mac. Превращает любое видео или изображение
+в обои рабочего стола, со встроенной галереей [Pixabay](https://pixabay.com) —
+поиск, предпросмотр и установка в один клик.
 
 ## Возможности
 
-- Видео- и фото-обои: основной монитор (по умолчанию), все или конкретный
-- Бесшовный луп видео (AVPlayerLooper), звук выключен
-- Drag & drop файла прямо в окно или выбор через диалог
-- Галерея Pixabay в том же окне: категории «Видео» и «Картинки»,
-  поиск, бесконечный скролл с пагинацией
-  (нужен бесплатный API-ключ — приложение показывает инструкцию при первом запуске)
-- Предпросмотр перед установкой (стриминг без скачивания), автор контента на карточках
-- Параллельные загрузки с прогресс-баром на каждой карточке
-- Вкладка «Загруженные»: повторная установка и удаление скачанного
-- Режимы «Заполнить» / «Вписать»
-- Автозапуск при входе в систему (переключается в настройках, `SMAppService`)
-- Запоминает выбранные обои и ставит их при старте
-- Пересоздаёт окна при смене конфигурации мониторов
-- Окно фиксированного размера (980×620), Help на английском (⌘?)
+- **Видео- и фото-обои** — MP4/MOV с бесшовным лупом или статичные изображения
+- **Несколько мониторов** — основной (по умолчанию), все или конкретный
+- **Галерея Pixabay** — тысячи бесплатных видео и фото, бесконечный скролл,
+  потоковый предпросмотр, параллельные загрузки с прогрессом
+- **Вкладка «Загрузки»** — повторная установка и удаление скачанного
+- **Drag & drop** — перетащите локальный файл на карточку предпросмотра
+- **10 языков** — переключатель в настройках (английский, русский, китайский,
+  японский, немецкий, испанский, португальский, французский, корейский, польский)
+  плюс системный; справка и поиск Pixabay следуют выбранной локали
+- **Энергоэффективность** — аппаратное декодирование (~2–3% CPU для 1080p),
+  пауза при перекрытии рабочего стола, блокировке экрана и сне
+- **Автозапуск** — опционально, в настройках
+- **Нативный Liquid Glass UI** — SwiftUI на macOS Tahoe
 
-## Оптимизации
+## Установка
 
-- Аппаратное декодирование видео; статичные картинки — 0% CPU
-- Пауза декодирования, когда рабочий стол полностью перекрыт окнами
-  или fullscreen-приложением (occlusion state)
-- Пауза при блокировке экрана, скринсейвере и сне системы
-- Обои не мешают дисплею засыпать (`preventsDisplaySleepDuringVideoPlayback = false`)
-- Скачанные из Pixabay медиа кешируются в `~/Library/Application Support/LiquidWall/Videos`
-
-## Сборка и запуск
-
-Нужен Xcode 26+ (Swift 6.2+), macOS 26+.
-
-```bash
-./build.sh
-open build/LiquidWall.app
-```
-
-## Упаковка в DMG
-
-Нужен [dmgbuild](https://github.com/dmgbuild/dmgbuild): `pip3 install dmgbuild`.
-
-```bash
-./package.sh   # соберёт build/LiquidWall-<версия>.dmg
-```
-
-DMG открывается со стандартной раскладкой «перетащи в Applications»:
-фон, иконка приложения слева, папка Applications справа
-(настройки раскладки — в `dmg-settings.py`).
-
-Приложение подписано ad-hoc (без Developer ID), поэтому при первом запуске
-на другом устройстве Gatekeeper его заблокирует. Обойти:
-Системные настройки → Конфиденциальность и безопасность → «Всё равно открыть»,
-либо снять карантин командой:
+1. Скачайте последний `.dmg` из [Releases](https://github.com/daifoll/LiquidWall/releases)
+2. Откройте и перетащите **LiquidWall** в **Программы**
+3. При первом запуске Gatekeeper предупредит о неподписанном приложении.
+   **Системные настройки → Конфиденциальность и безопасность → Всё равно открыть**,
+   либо:
 
 ```bash
 xattr -d com.apple.quarantine /Applications/LiquidWall.app
 ```
 
-## Структура
+> Требуется **macOS Tahoe (26.0) или новее**.
 
-- `Sources/LiquidWall/WallpaperEngine.swift` — окна на уровне рабочего стола, видео и картинки, выбор мониторов
-- `Sources/LiquidWall/AppModel.swift` — состояние приложения, пагинация, загрузки, библиотека, автозапуск
-- `Sources/LiquidWall/ContentView.swift` — компоновка окна и сайдбар
-- `Sources/LiquidWall/GalleryView.swift` — онбординг, галерея Pixabay, предпросмотр, загруженные
-- `Sources/LiquidWall/HelpView.swift` — справка (английский)
-- `Sources/LiquidWall/PixabayClient.swift` — клиент Pixabay API, параллельные загрузки с прогрессом
-- `Sources/LiquidWall/LiquidWallApp.swift` — точка входа
-- `Resources/AppIcon.icns` — иконка приложения
-- `dmg-settings.py` — раскладка DMG-установщика
+## Ключ API Pixabay
+
+Галерее нужен бесплатный API-ключ (занимает пару минут):
+
+1. Зарегистрируйтесь на [pixabay.com](https://pixabay.com/accounts/register/)
+2. Откройте [документацию API](https://pixabay.com/api/docs/) — ключ в разделе
+   *Parameters* рядом с полем `key`
+3. Вставьте его в приложение при первом запуске
+
+## Сборка из исходников
+
+Нужен Xcode 26+ (Swift 6.2+).
+
+```bash
+./build.sh                     # соберёт build/LiquidWall.app
+open build/LiquidWall.app
+```
+
+DMG (нужен [dmgbuild](https://github.com/dmgbuild/dmgbuild), `pip3 install dmgbuild`):
+
+```bash
+./package.sh                   # соберёт build/LiquidWall-<версия>.dmg
+```
+
+## Как это работает
+
+В macOS нет публичного API для видео-обоев, поэтому LiquidWall рендерит контент
+в безрамочном окне на уровне рабочего стола (`kCGDesktopWindowLevel`) — над
+системными обоями, под иконками и окнами. Видео через `AVQueuePlayer` +
+`AVPlayerLooper` с аппаратным `AVPlayerLayer`; картинки — `CALayer` (0% CPU).
+
+| Путь | Назначение |
+| --- | --- |
+| `Sources/LiquidWall/WallpaperEngine.swift` | Окна на уровне рабочего стола, воспроизведение |
+| `Sources/LiquidWall/AppModel.swift` | Состояние, поиск, загрузки, библиотека |
+| `Sources/LiquidWall/ContentView.swift` | Компоновка окна и сайдбар |
+| `Sources/LiquidWall/GalleryView.swift` | Галерея Pixabay, предпросмотр, загрузки |
+| `Sources/LiquidWall/PixabayClient.swift` | Клиент Pixabay API |
+| `Sources/LiquidWall/Localization.swift` | Переключатель языка и resource bundle |
+| `dmg-settings.py` | Раскладка DMG ([dmgbuild](https://github.com/dmgbuild/dmgbuild)) |
 
 ## Ограничения
 
-- Обои не видны поверх fullscreen-приложений (окно находится за ними)
-- Официального API для видео-обоев в macOS нет — используется окно на
-  уровне `kCGDesktopWindowLevel`
-- Картинки из Pixabay без одобренного API-аккаунта доступны в максимум 1280px
-  (для полного разрешения Pixabay должен одобрить аккаунт)
+- Обои не видны поверх полноэкранных приложений (окно за ними)
+- Фото Pixabay ограничены 1280 px без одобренного API-аккаунта; видео — без лимита
+
+## Переводы
+
+README доступен на 10 языках — ссылки вверху страницы.
+
+> **Примечание:** переводы интерфейса и README сгенерированы с помощью ИИ и могут
+> содержать неточности. Если заметите ошибку — откройте issue или pull request.
 
 ## Автор
 
+- Медиа от [Pixabay](https://pixabay.com) по лицензии Pixabay Content License
 - Создано [daifoll](https://github.com/daifoll)
-- Проект разработан с помощью нейросети (вайбкодинг) на модели **Fable 5** в [Cursor](https://cursor.com)
+- Разработано с помощью AI (вайбкодинг) на модели **Fable 5** в [Cursor](https://cursor.com)
 
 ## Лицензия
 

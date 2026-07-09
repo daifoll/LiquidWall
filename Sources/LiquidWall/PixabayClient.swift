@@ -73,10 +73,13 @@ enum GalleryItem: Identifiable, Hashable {
     }
 
     /// Бейдж на карточке: длительность для видео, nil для картинок
-    var badge: String? {
+    func badge(locale: Locale = .current) -> String? {
         switch self {
-        case .video(let video): "\(video.duration) c"
-        case .photo: nil
+        case .video(let video):
+            let format = String(localized: "duration.seconds", bundle: AppBundle.resources, locale: locale)
+            return String(format: format, locale: locale, video.duration)
+        case .photo:
+            return nil
         }
     }
 
@@ -100,13 +103,19 @@ enum GalleryItem: Identifiable, Hashable {
 enum PixabayError: LocalizedError {
     case invalidKey
     case rateLimited
-    case server(String)
+    case server(Int)
+    case badURL
 
     var errorDescription: String? {
         switch self {
-        case .invalidKey: "Неверный API-ключ"
-        case .rateLimited: "Превышен лимит запросов, подожди минуту"
-        case .server(let message): message
+        case .invalidKey:
+            String(localized: "pixabay.error.invalid_key", bundle: AppBundle.resources)
+        case .rateLimited:
+            String(localized: "pixabay.error.rate_limited", bundle: AppBundle.resources)
+        case .server(let code):
+            String(format: String(localized: "pixabay.error.server", bundle: AppBundle.resources), code)
+        case .badURL:
+            String(localized: "pixabay.error.bad_url", bundle: AppBundle.resources)
         }
     }
 }
@@ -124,6 +133,7 @@ struct PixabayClient {
     static let perPage = 30
 
     let apiKey: String
+    let lang: String
 
     func searchVideos(query: String, page: Int) async throws -> Page {
         struct Response: Decodable {
@@ -164,6 +174,7 @@ struct PixabayClient {
         components.queryItems = [
             URLQueryItem(name: "key", value: apiKey),
             URLQueryItem(name: "q", value: query),
+            URLQueryItem(name: "lang", value: lang),
             URLQueryItem(name: "safesearch", value: "true"),
             URLQueryItem(name: "per_page", value: String(Self.perPage)),
             URLQueryItem(name: "page", value: String(page)),
@@ -174,7 +185,7 @@ struct PixabayClient {
             switch http.statusCode {
             case 400...403: throw PixabayError.invalidKey
             case 429: throw PixabayError.rateLimited
-            default: throw PixabayError.server("Ошибка сервера (\(http.statusCode))")
+            default: throw PixabayError.server(http.statusCode)
             }
         }
         return data
@@ -229,7 +240,7 @@ struct PixabayClient {
         }
 
         guard let remote else {
-            throw PixabayError.server("Некорректная ссылка на файл")
+            throw PixabayError.badURL
         }
 
         let destination = Self.libraryDirectory.appending(path: filename)

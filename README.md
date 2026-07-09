@@ -9,7 +9,16 @@
 </p>
 
 <p align="center">
-  <a href="README.ru.md">Русская версия</a>
+  <strong>English</strong> ·
+  <a href="README.ru.md">Русский</a> ·
+  <a href="README.zh-Hans.md">简体中文</a> ·
+  <a href="README.ja.md">日本語</a> ·
+  <a href="README.de.md">Deutsch</a> ·
+  <a href="README.es.md">Español</a> ·
+  <a href="README.pt-BR.md">Português (Brasil)</a> ·
+  <a href="README.fr.md">Français</a> ·
+  <a href="README.ko.md">한국어</a> ·
+  <a href="README.pl.md">Polski</a>
 </p>
 
 <p align="center">
@@ -32,6 +41,9 @@ for discovering free content — search, preview, and apply in one click.
   infinite scroll, streaming preview before applying, parallel downloads with progress
 - **Library tab** — re-apply or delete previously downloaded media
 - **Drag & drop** — drop any local file onto the preview card
+- **10 languages** — in-app language switcher (English, Russian, Chinese, Japanese,
+  German, Spanish, Portuguese, French, Korean, Polish) plus System default;
+  Help and Pixabay search follow the selected locale
 - **Power-efficient** — hardware-accelerated decoding (~2–3% CPU for 1080p video),
   playback pauses automatically when the desktop is covered, the screen is locked,
   or the system sleeps
@@ -93,6 +105,7 @@ Project layout:
 | `Sources/LiquidWall/ContentView.swift` | Window layout and sidebar |
 | `Sources/LiquidWall/GalleryView.swift` | Pixabay gallery, preview, downloads library |
 | `Sources/LiquidWall/PixabayClient.swift` | Pixabay API client |
+| `Sources/LiquidWall/Localization.swift` | Language picker and resource bundle |
 | `dmg-settings.py` | DMG installer layout ([dmgbuild](https://github.com/dmgbuild/dmgbuild)) |
 
 ## Limitations
@@ -100,6 +113,13 @@ Project layout:
 - The wallpaper is not visible over full-screen apps (it sits behind them)
 - Pixabay photos are limited to 1280 px unless your API account is approved
   for full resolution; videos have no such limit
+
+## Translations
+
+README files are available in 10 languages — see the links at the top of this page.
+
+> **Note:** UI and README translations were generated with AI and may contain
+> inaccuracies. If you spot an error, please open an issue or pull request.
 
 ## Credits
 

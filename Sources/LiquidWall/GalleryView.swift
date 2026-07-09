@@ -54,39 +54,48 @@ struct OnboardingView: View {
                 .font(.system(size: 42, weight: .light))
                 .foregroundStyle(.secondary)
 
-            Text("Подключи галерею Pixabay")
+            Text("onboarding.title", bundle: .module)
                 .font(.title2.weight(.semibold))
 
-            Text("Тысячи бесплатных видео и картинок для обоев.\nНужен только API-ключ — он бесплатный, получается за пару минут.")
+            Text("onboarding.subtitle", bundle: .module)
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
 
             VStack(alignment: .leading, spacing: 12) {
                 instructionRow(number: 1) {
-                    Text("Зарегистрируйся на [pixabay.com](https://pixabay.com/ru/accounts/register/)")
+                    HStack(spacing: 4) {
+                        Text("onboarding.step1", bundle: .module)
+                        Link("pixabay.com", destination: URL(string: "https://pixabay.com/accounts/register/")!)
+                    }
                 }
                 instructionRow(number: 2) {
-                    Text("Открой страницу [документации API](https://pixabay.com/api/docs/)")
+                    HStack(spacing: 4) {
+                        Text("onboarding.step2", bundle: .module)
+                        Link("pixabay.com/api/docs", destination: URL(string: "https://pixabay.com/api/docs/")!)
+                    }
                 }
                 instructionRow(number: 3) {
-                    Text("Ключ показан в разделе «Parameters» рядом с полем **key**")
+                    Text("onboarding.step3", bundle: .module)
                 }
                 instructionRow(number: 4) {
-                    Text("Вставь его сюда:")
+                    Text("onboarding.step4", bundle: .module)
                 }
             }
             .padding(20)
             .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
 
             HStack(spacing: 10) {
-                SecureField("API-ключ", text: $draft)
+                SecureField(
+                    String(localized: "onboarding.api_key_placeholder", bundle: .module),
+                    text: $draft
+                )
                     .textFieldStyle(.plain)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
                     .glassEffect(.regular, in: Capsule())
                     .onSubmit(save)
-                Button("Сохранить", action: save)
+                Button("onboarding.save", action: save)
                     .buttonStyle(.glassProminent)
                     .buttonBorderShape(.capsule)
                     // .large подгоняет высоту кнопок под инпуты (вертикальный padding 8),
@@ -131,7 +140,10 @@ struct GalleryPane: View {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(.secondary)
-                    TextField("Поиск: nature, ocean, rain…", text: $model.searchQuery)
+                    TextField(
+                        String(localized: "gallery.search_placeholder", bundle: .module),
+                        text: $model.searchQuery
+                    )
                         .textFieldStyle(.plain)
                         .focused($searchFocused)
                         .onSubmit { Task { await model.search() } }
@@ -145,7 +157,7 @@ struct GalleryPane: View {
                                 .foregroundStyle(.secondary)
                         }
                         .buttonStyle(.plain)
-                        .help("Очистить запрос")
+                        .help(String(localized: "gallery.clear_search", bundle: .module))
                     }
                 }
                 .padding(.horizontal, 14)
@@ -155,7 +167,7 @@ struct GalleryPane: View {
 
                 Picker("", selection: $model.category) {
                     ForEach(GalleryCategory.allCases) { category in
-                        Text(category.rawValue).tag(category)
+                        Text(category.label).tag(category)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -197,7 +209,10 @@ struct GalleryPane: View {
                 }
             }
 
-            Text("Медиа предоставлены [Pixabay](https://pixabay.com)")
+            HStack(spacing: 4) {
+                Text("gallery.pixabay_attribution", bundle: .module)
+                Link("Pixabay", destination: URL(string: "https://pixabay.com")!)
+            }
                 .font(.caption)
                 .foregroundStyle(.tertiary)
                 .padding(.vertical, 8)
@@ -215,6 +230,7 @@ struct GalleryPane: View {
 
 private struct MediaCard: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.locale) private var locale
     let item: GalleryItem
 
     @State private var isHovering = false
@@ -261,7 +277,7 @@ private struct MediaCard: View {
             // «вылезшее» изображение перехватывает наведение у соседних карточек
             .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(alignment: .bottomLeading) {
-                if let badge = item.badge {
+                if let badge = item.badge(locale: locale) {
                     cardCapsule(systemImage: "clock", text: badge)
                         .padding(7)
                         .opacity(isHovering || progress != nil ? 0 : 1)
@@ -342,7 +358,9 @@ struct PreviewSheet: View {
 
                 Spacer()
 
-                Button("Закрыть") { dismiss() }
+                Button { dismiss() } label: {
+                    Text("preview.close", bundle: .module)
+                }
                     .buttonStyle(.glass)
                     .buttonBorderShape(.capsule)
                     .controlSize(.large)
@@ -352,11 +370,13 @@ struct PreviewSheet: View {
                         .progressViewStyle(.linear)
                         .frame(width: 120)
                 } else {
-                    Button("Установить") {
+                    Button {
                         Task {
                             await model.downloadAndApply(item)
                             dismiss()
                         }
+                    } label: {
+                        Text("preview.apply", bundle: .module)
                     }
                     .buttonStyle(.glassProminent)
                     .buttonBorderShape(.capsule)
@@ -400,7 +420,7 @@ struct LibraryPane: View {
                     Image(systemName: "square.stack.3d.up.slash")
                         .font(.system(size: 32, weight: .light))
                         .foregroundStyle(.secondary)
-                    Text("Пока ничего не скачано")
+                    Text("library.empty", bundle: .module)
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }

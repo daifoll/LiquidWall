@@ -49,7 +49,7 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 Picker("", selection: $model.pane) {
                     ForEach(ContentPane.allCases) { pane in
-                        Text(pane.rawValue).tag(pane)
+                        Text(pane.label).tag(pane)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -148,7 +148,7 @@ private struct SidebarView: View {
 
             Picker("", selection: $model.fillMode) {
                 ForEach(FillMode.allCases) { mode in
-                    Text(mode.rawValue).tag(mode)
+                    Text(mode.label).tag(mode)
                 }
             }
             .pickerStyle(.segmented)
@@ -159,7 +159,12 @@ private struct SidebarView: View {
 
             settingsCard
 
-            Text("LiquidWall \(Self.appVersion)")
+            Text(
+                String(
+                    format: String(localized: "app.version", bundle: .module),
+                    Self.appVersion
+                )
+            )
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
         }
@@ -180,7 +185,7 @@ private struct SidebarView: View {
                     Image(systemName: "sparkles.tv")
                         .font(.system(size: 32, weight: .light))
                         .foregroundStyle(.secondary)
-                    Text("Перетащи видео\nили картинку сюда")
+                    Text("preview.drop_hint", bundle: .module)
                         .font(.callout)
                         .multilineTextAlignment(.center)
                         .foregroundStyle(.secondary)
@@ -215,17 +220,36 @@ private struct SidebarView: View {
         @Bindable var model = model
 
         return VStack(alignment: .leading, spacing: 14) {
-            Label("Настройки", systemImage: "gearshape")
+            Label {
+                Text("settings.title", bundle: .module)
+            } icon: {
+                Image(systemName: "gearshape")
+            }
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(.secondary)
 
             HStack {
-                Text("Экран")
+                Text("settings.language", bundle: .module)
+                    .font(.callout)
+                Spacer()
+                Picker("", selection: $model.appLanguage) {
+                    Text("language.system", bundle: .module).tag(AppLanguage.system)
+                    Divider()
+                    ForEach(AppLanguage.selectable) { lang in
+                        Text(lang.nativeName).tag(lang)
+                    }
+                }
+                .labelsHidden()
+                .fixedSize()
+            }
+
+            HStack {
+                Text("settings.display", bundle: .module)
                     .font(.callout)
                 Spacer()
                 Picker("", selection: $model.displayTarget) {
-                    Text("Основной").tag(DisplayTarget.main)
-                    Text("Все экраны").tag(DisplayTarget.all)
+                    Text("display.main", bundle: .module).tag(DisplayTarget.main)
+                    Text("display.all", bundle: .module).tag(DisplayTarget.all)
                     Divider()
                     ForEach(model.availableScreens, id: \.id) { screen in
                         Text(screen.name).tag(DisplayTarget.screen(screen.id))
@@ -235,17 +259,21 @@ private struct SidebarView: View {
                 .fixedSize()
             }
 
-            Toggle("Запускать при входе в систему", isOn: $model.launchAtLogin)
+            Toggle(isOn: $model.launchAtLogin) {
+                Text("settings.launch_at_login", bundle: .module)
+            }
                 .toggleStyle(.switch)
                 .controlSize(.small)
                 .font(.callout)
 
             HStack {
-                Text("API-ключ Pixabay")
+                Text("settings.pixabay_key", bundle: .module)
                     .font(.callout)
                 Spacer()
-                Button("Сменить") {
+                Button {
                     model.pixabayKey = ""
+                } label: {
+                    Text("settings.change", bundle: .module)
                 }
                 .buttonStyle(.glass)
                 .buttonBorderShape(.capsule)
@@ -286,7 +314,7 @@ private struct SidebarView: View {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = AppModel.allowedTypes
         panel.allowsMultipleSelection = false
-        panel.message = "Выбери видео или картинку для обоев"
+        panel.message = String(localized: "open_panel.message", bundle: .module)
         if panel.runModal() == .OK, let url = panel.url {
             model.select(url: url)
         }

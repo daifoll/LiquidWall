@@ -4,10 +4,17 @@ import ServiceManagement
 import UniformTypeIdentifiers
 
 enum FillMode: String, CaseIterable, Identifiable {
-    case fill = "Заполнить"
-    case fit = "Вписать"
+    case fill
+    case fit
 
     var id: String { rawValue }
+
+    var label: LocalizedStringResource {
+        switch self {
+        case .fill: "fill_mode.fill"
+        case .fit: "fill_mode.fit"
+        }
+    }
 
     var gravity: AVLayerVideoGravity {
         switch self {
@@ -18,17 +25,31 @@ enum FillMode: String, CaseIterable, Identifiable {
 }
 
 enum GalleryCategory: String, CaseIterable, Identifiable {
-    case videos = "Видео"
-    case photos = "Картинки"
+    case videos
+    case photos
 
     var id: String { rawValue }
+
+    var label: LocalizedStringResource {
+        switch self {
+        case .videos: "gallery_category.videos"
+        case .photos: "gallery_category.photos"
+        }
+    }
 }
 
 enum ContentPane: String, CaseIterable, Identifiable {
-    case gallery = "Галерея"
-    case library = "Загруженные"
+    case gallery
+    case library
 
     var id: String { rawValue }
+
+    var label: LocalizedStringResource {
+        switch self {
+        case .gallery: "content_pane.gallery"
+        case .library: "content_pane.library"
+        }
+    }
 }
 
 struct LibraryItem: Identifiable, Hashable {
@@ -47,12 +68,12 @@ final class AppModel {
     private static let savedPathKey = "videoPath"
     private static let pixabayKeyKey = "pixabayAPIKey"
     private static let displayTargetKey = "displayTarget"
+    private static let appLanguageKey = "appLanguage"
 
     var mediaURL: URL?
     var isActive = false
     var isPlaying = false
 
-    /// Текущие обои — видео (для картинок play/pause не имеет смысла)
     var isVideoContent: Bool {
         guard let url = mediaURL else { return false }
         return MediaKind.of(url) == .video
@@ -60,6 +81,26 @@ final class AppModel {
 
     var fillMode: FillMode = .fill {
         didSet { engine.setGravity(fillMode.gravity) }
+    }
+
+    // MARK: - Язык
+
+    var appLanguage: AppLanguage = AppLanguage.resolved(
+        from: UserDefaults.standard.string(forKey: appLanguageKey)
+    ) {
+        didSet {
+            UserDefaults.standard.set(appLanguage.rawValue, forKey: Self.appLanguageKey)
+        }
+    }
+
+    var resolvedLocale: Locale {
+        appLanguage.locale
+    }
+
+    var pixabayLang: String {
+        appLanguage == .system
+            ? AppLanguage.fromSystemLocale().pixabayLang
+            : appLanguage.pixabayLang
     }
 
     // MARK: - Мониторы
@@ -74,7 +115,6 @@ final class AppModel {
         }
     }
 
-    /// Подключённые мониторы для пикера: (id, имя)
     var availableScreens: [(id: CGDirectDisplayID, name: String)] {
         NSScreen.screens.map { ($0.displayID, $0.localizedName) }
     }
@@ -109,7 +149,6 @@ final class AppModel {
     var isLoadingMore = false
     var searchError: String?
 
-    /// Прогресс активных загрузок: id элемента → 0...1
     var downloadProgress: [String: Double] = [:]
     var previewItem: GalleryItem?
 
@@ -119,7 +158,9 @@ final class AppModel {
     private var totalHits = 0
     private var didRestore = false
 
-    private var client: PixabayClient { PixabayClient(apiKey: pixabayKey) }
+    private var client: PixabayClient {
+        PixabayClient(apiKey: pixabayKey, lang: pixabayLang)
+    }
 
     init() {
         restoreDisplayTarget()
@@ -127,9 +168,6 @@ final class AppModel {
         refreshLibrary()
     }
 
-    /// Восстанавливает последние обои. Вызывается из onAppear главного окна:
-    /// если создать окна-обоев раньше (в init, до завершения запуска),
-    /// SwiftUI не показывает главное окно приложения.
     func restoreOnLaunch() {
         guard !didRestore else { return }
         didRestore = true
@@ -188,7 +226,7 @@ final class AppModel {
             items = result.items
             totalHits = result.totalHits
             if items.isEmpty {
-                searchError = "Ничего не нашлось, попробуй другой запрос"
+                searchError = String(localized: "error.no_results", bundle: .module)
             }
         } catch {
             items = []
@@ -197,7 +235,6 @@ final class AppModel {
         isSearching = false
     }
 
-    /// Подгружает следующую страницу, когда пользователь доскроллил до конца
     func loadMoreIfNeeded(after item: GalleryItem) async {
         guard item.id == items.last?.id,
               !isLoadingMore, !isSearching,
@@ -228,7 +265,6 @@ final class AppModel {
         { [downloadProgress] in downloadProgress[$0.id] != nil }
     }
 
-    /// Загрузки параллельны: каждая идёт в своём Task, прогресс — по id элемента
     func downloadAndApply(_ item: GalleryItem) async {
         guard downloadProgress[item.id] == nil else { return }
         downloadProgress[item.id] = 0
@@ -242,7 +278,8 @@ final class AppModel {
             refreshLibrary()
             select(url: url)
         } catch {
-            searchError = "Не удалось скачать: \(error.localizedDescription)"
+            let template = String(localized: "error.download_failed", bundle: .module)
+            searchError = String(format: template, error.localizedDescription)
         }
     }
 
@@ -267,7 +304,6 @@ final class AppModel {
     }
 
     func deleteLibraryItem(_ item: LibraryItem) {
-        // Если удаляем текущие обои — сначала останавливаем
         if mediaURL == item.url {
             stop()
             mediaURL = nil
@@ -277,7 +313,7 @@ final class AppModel {
         refreshLibrary()
     }
 
-    // MARK: - Персистентность мониторов
+    // MARK: - Персистентность
 
     private func saveDisplayTarget() {
         let value: String = switch displayTarget {
